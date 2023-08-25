@@ -1,5 +1,7 @@
 import React from "react";
 import styled from "styled-components";
+import LikeButton from "./LikeButton";
+
 import normal from "../assets/normal.svg";
 import fighting from "../assets/fighting.svg";
 import flying from "../assets/flying.svg";
@@ -40,36 +42,51 @@ const pokemonAttributes = {
   steel: { color: "#5695A3", icon: steel },
   default: { color: "#A4A4A4", icon: null },
 };
-
+//#region css
 const CardContainer = styled.div`
   background-color: white;
   border-radius: 8px;
   padding: 16px;
-  margin: 8px 0;
+  margin: 15px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: ${(props) => `0px 0px 100px 0px ${props.color}`};
+  box-shadow: ${(props) =>
+    props.types[1].color === ""
+      ? `0px 0px 100px 0px ${props.types[0].color}`
+      : `30px 0px 100px 0px ${props.types[1].color},
+        -30px 0px 100px 0px ${props.types[0].color}`};
 `;
 
 const PokemonImage = styled.img`
   width: 200px;
   height: 200px;
-  margin-bottom: 8px;
 `;
 
 const NameText = styled.p`
-  font-size: 16px;
+  font-size: 20px;
   font-weight: bold;
+  margin: 0px;
   margin-bottom: 8px;
   color: black;
 `;
+
 const StatText = styled.div`
   font-size: 16px;
   font-weight: bold;
   margin: 0px;
   margin-bottom: 8px;
   color: black;
+  width: 100%;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-around;
+`;
+const TypeContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 `;
 
 const TypeText = styled.p`
@@ -84,10 +101,6 @@ const TypeIcon = styled.div`
   width: 30px;
   margin: auto;
   margin-left: 5px;
-  /* display: flex;
-  flex-flow: row;
-  align-items: center;
-  justify-content: center; */
   background: ${(props) => props.color || "#000"};
   box-shadow: ${(props) => `0px 0px 20px 0px ${props.color}`};
   & > img {
@@ -96,26 +109,51 @@ const TypeIcon = styled.div`
     width: 60%;
   }
 `;
+const Buttons = styled.div`
+  display: flex;
+  flex-flow: row-wrap;
+  align-items: center;
+`;
+//#endregion
 
-const Card = ({ name, sprite, id, height, weight, type }) => {
-  console.log(type);
+const Card = ({ pokemon }) => {
+  const type1 = pokemon.types[0].type.name;
+  const type2 = pokemon.types.length > 1 ? pokemon.types[1].type.name : null;
+
   const {
-    color = pokemonAttributes.default.color,
-    icon = pokemonAttributes.default.icon,
-  } = pokemonAttributes[type] || {};
+    color: color1 = pokemonAttributes.default.color,
+    icon: icon1 = pokemonAttributes.default.icon,
+  } = pokemonAttributes[type1] || {};
+
+  const { color: color2 = "", icon: icon2 = pokemonAttributes.default.icon } =
+    pokemonAttributes[type2] || {};
+
   return (
-    <CardContainer color={color}>
-      <PokemonImage src={sprite} alt={name} />
-      <NameText>{name}</NameText>
-      <StatText>ID: {id}</StatText>
-      <StatText>Height: {height}</StatText>
-      <StatText>Weight: {weight}</StatText>
-      <StatText style={{ display: "flex", flexFlow: "row" }}>
-        Type: <TypeText color={color}>{type}</TypeText>
-        <TypeIcon color={color}>
-          <img src={icon} alt={`${type} icon`} />
-        </TypeIcon>
+    <CardContainer types={[{ color: color1 }, { color: color2 }]}>
+      <PokemonImage src={pokemon.sprites?.front_default} alt={pokemon.name} />
+      <NameText>{pokemon.name}</NameText>
+      <StatText>
+        <TypeContainer>
+          <TypeText color={color1}>{type1}</TypeText>
+          <TypeIcon color={color1}>
+            <img src={icon1} alt={`${type1} icon`} />
+          </TypeIcon>
+        </TypeContainer>
+        {type2 !== null && (
+          <TypeContainer>
+            <TypeText color={color2}>{type2}</TypeText>
+            <TypeIcon color={color2}>
+              <img src={icon2} alt={`${type2} icon`} />
+            </TypeIcon>
+          </TypeContainer>
+        )}
       </StatText>
+      <Buttons>
+        <LikeButton pokemon={pokemon} />
+        {/* <Link to={`/pokemon/${pokemon.id}`}>
+          <MoreButton> En savoir plus </MoreButton>
+        </Link> */}
+      </Buttons>
     </CardContainer>
   );
 };
