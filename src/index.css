@@ -14,22 +14,47 @@
   -webkit-text-size-adjust: 100%;
 }
 
+ul{
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+}
+li{
+  margin: 10px;
+}
+.active{
+  color: white;
+  text-decoration: underline;
+}
+
+*{
+  list-style: none;
+}
+
 a {
   font-weight: 500;
-  color: #646cff;
+  color: lightgrey;
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  text-decoration: underline;
+  color: white;
+}
+
+html{
+  width: 100%;
+  height: 100%;
 }
 
 body {
   margin: 0;
   padding: 0;
   display: flex;
-  place-items: center;
-  min-width: 320px;
+  justify-content: center;
+  min-width: 90vw;
   min-height: 100vh;
+  background-color: #111;
 }
 
 

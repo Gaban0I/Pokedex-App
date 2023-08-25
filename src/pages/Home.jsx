@@ -1,165 +1,172 @@
 import React, { useState, useEffect } from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import Card from "../components/Card";
-import Loading from "../components/Loading";
+import Loader from "../components/Loader";
+import Error from "../components/Error";
+import { getPokemonList, getPokemonByName } from "../ApiService";
+import ReactPaginate from "react-paginate";
+
+//#region css
 
 const Container = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #111;
-  width: 100vw;
-  height: 100vh;
-`;
-
-const SwipeContainer = styled.div`
-  display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-around;
-  padding: 16px;
-  width: 400px;
-  max-width: 100%;
+  width: 100%;
+  height: 100%;
 `;
 
-const ButtonsContainer = styled.div`
+const SearchInputContainer = styled.div`
+  margin-bottom: 20px;
+`;
+const SearchInput = styled.input`
+  height: 40px;
+  width: 250px;
+  padding: 5px;
+  box-sizing: border-box;
+  border: 2px solid black;
+  border-radius: 20px 0px 0px 20px;
+`;
+
+const pulseAnimation = keyframes`
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+`;
+
+const SearchButton = styled.button`
+  height: 40px;
+  width: 40px;
+  border: 2px solid black;
+  border-left: 0px;
+  border-radius: 0px 20px 20px 0px;
+  cursor: pointer;
+  transition: transform 0.1s ease-in-out;
+  &:active {
+    transform: translateY(4px);
+  }
+`;
+
+const Cards = styled.div`
   display: flex;
-  flex-direction: row;
-  justify-content: center;
-  margin-top: 16px;
+  flex-flow: row wrap;
+  justify-content: space-around;
 `;
-
-const Button = styled.button`
-  border-radius: 8px;
-  padding: 12px 24px;
-  margin: 0 8px;
-  color: white;
-  font-size: 16px;
-  font-weight: bold;
-  background-color: ${props => (props.like ? "green" : "red")};
-`;
-
-const STORAGE_NAME = "PokeSwipe_734a1dc0-26df-11ee-be56-0242ac120002";
+//#endregion
 
 export default function App() {
-    const [poke, setPoke] = useState([]);
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [isLoading, setIsLoading] = useState(true);
-    const [pokeUrl, setPokeUrl] = useState("https://pokeapi.co/api/v2/pokemon");
-    const [likedPokemons, setLikedPokemons] = useState({});
+  const [poke, setPoke] = useState([]);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [val, setVal] = useState("");
+  const [currentIndex, setCurrentIndex] = useState(1);
+  const [IndexNumber, setIndexNumber] = useState(0);
 
-    useEffect(() => {
-      getPoke();
-    }, []);
-    useEffect(() => {
-      (async () => {
-        const dataStore = localStorage.getItem(STORAGE_NAME);
-        setLikedPokemons(JSON.parse(dataStore) || {});
-      })();
-    }, []);
+  useEffect(() => {
+    getPoke();
+  }, []);
 
-    const handleSetFav = (id) => {
-      let dataStore = localStorage.getItem(STORAGE_NAME);
-      if (!dataStore) {
-        const newSavedStorage = {};
-        newSavedStorage[id] = id;
-        localStorage.setItem(STORAGE_NAME, JSON.stringify(newSavedStorage));
-      } else {
-        dataStore = JSON.parse(dataStore);
-        dataStore[id] = id;
-        localStorage.setItem(STORAGE_NAME, JSON.stringify(dataStore));
-      }
-    };
+  const change = (event) => {
+    setVal(event.target.value);
+  };
 
-    const clearAllData = () => {
+  const getPokeByName = async (value) => {
+    if (value !== "") {
+      setCurrentIndex(1);
+      setIsLoading(true);
       try {
-        localStorage.clear();
-      } catch (e) {
-        console.error(e);
-      }
-    };
-
-    const getPoke = async () => {
-      try {
-        const response = await fetch(pokeUrl);
-        const json = await response.json();
-        setPokeUrl(json.next);
-        const pokeList = await Promise.all(
-          json.results.map(async (poke) => {
-            const res = await fetch(poke.url);
-            const data = await res.json();
-            return data;
-          })
-        );
-        setPoke((prevPoke) => [...prevPoke, ...pokeList]);
+        const pokeData = await getPokemonByName(value);
+        setError(null);
+        setPoke([pokeData]);
         setIsLoading(false);
       } catch (error) {
-        console.error(error);
+        setError(error.message);
+        setIsLoading(false);
       }
-    };
+    } else {
+      getPoke();
+    }
+  };
 
-    const handleSwipe = (direction) => {
-      if (direction === "right") {
-        handleLike();
-      } else if (direction === "left") {
-        handleDislike();
-      }
-      if (currentIndex === poke.length - 2) getPoke();
-      setCurrentIndex(currentIndex + 1);
-    };
+  const getPoke = async () => {
+    try {
+      setIsLoading(true);
+      const pokeList = await getPokemonList((currentIndex - 1) * 10, 10);
+      setIndexNumber(Math.ceil(pokeList.count / 10));
+      const pokeListData = await Promise.all(
+        pokeList.results.map(async (poke) => {
+          return getPokemonByName(poke.name);
+        })
+      );
+      setError(null);
+      setPoke(pokeListData);
+      setIsLoading(false);
+    } catch (error) {
+      setError(error.message);
+      setIsLoading(false);
+    }
+  };
 
-    const handleLike = () => {
-      handleSetFav(poke[currentIndex].id);
-      if (currentIndex === poke.length - 2) getPoke();
-      setCurrentIndex(currentIndex + 1);
-    };
+  const handlePageClick = (data) => {
+    setCurrentIndex(data.selected + 1);
+    getPoke();
+    console.log(currentIndex);
+  };
 
-    const handleDislike = () => {
-      if (currentIndex === poke.length - 2) getPoke();
-      setCurrentIndex(currentIndex + 1);
-    };
-
-    const renderPokeCards = () => {
-      if (isLoading) {
-        return <Loading />;
-      }
-      if (currentIndex >= poke.length) {
-        return <div>No more Pokémon to show!</div>;
-      }
-      return poke.map((p, index) => {
-        if (index === currentIndex) {
-          const isLiked = likedPokemons[p.id] !== undefined;
-          if (isLiked) {
-            if (currentIndex === poke.length - 2) getPoke();
-            setCurrentIndex(currentIndex + 1);
-            return null;
-          }
-          return (
-            <div key={p.name}>
-              <Card
-                name={p.name}
-                sprite={p.sprites?.front_default}
-                id={p.id}
-                height={p.height}
-                weight={p.weight}
-                type={p.types[0].type.name}
-              />
-            </div>
-          );
-        }
-        return null;
-      });
-    };
-
-    return (
-      <Container>
-        <SwipeContainer>
-          {renderPokeCards()}
-          <ButtonsContainer>
-            <Button onClick={() => handleSwipe("left")}>Dislike</Button>
-            <Button like onClick={() => handleSwipe("right")}>Like</Button>
-          </ButtonsContainer>
-        </SwipeContainer>
-      </Container>
-    );
+  return (
+    <Container>
+      <SearchInputContainer>
+        <SearchInput
+          type="text"
+          placeholder="Rechercher un Pokemon..."
+          aria-label="Rechercher un Pokemon..."
+          aria-describedby="button-addon"
+          value={val}
+          onChange={change}
+        />
+        <SearchButton
+          type="button"
+          id="button-addon"
+          onClick={() => getPokeByName(val)}
+        >
+          <i className="bi bi-search"></i>
+        </SearchButton>
+      </SearchInputContainer>
+      {error && <Error err={error} />}
+      {isLoading && <Loader />}
+      {!isLoading && !error && (
+        <Cards>
+          {poke.map((p) => (
+            <Card key={p.id} pokemon={p} />
+          ))}
+        </Cards>
+      )}
+      <ReactPaginate
+        nextLabel="next >"
+        onPageChange={handlePageClick}
+        pageRangeDisplayed={2}
+        marginPagesDisplayed={2}
+        pageCount={IndexNumber}
+        previousLabel="< previous"
+        pageClassName="page-item"
+        pageLinkClassName="page-link"
+        previousClassName="page-item"
+        previousLinkClassName="page-link"
+        nextClassName="page-item"
+        nextLinkClassName="page-link"
+        breakLabel="..."
+        breakClassName="page-item"
+        breakLinkClassName="page-link"
+        containerClassName="pagination"
+        activeClassName="active"
+        renderOnZeroPageCount={null}
+      />
+    </Container>
+  );
 }
