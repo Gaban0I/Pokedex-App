@@ -1,5 +1,5 @@
-import React from "react";
 import styled from "styled-components";
+import PropTypes from "prop-types";
 import LikeButton from "./LikeButton";
 
 import normal from "../assets/normal.svg";
@@ -44,9 +44,11 @@ const pokemonAttributes = {
 };
 //#region css
 const CardContainer = styled.div`
+  box-sizing: border-box;
+  max-width: 230px;
   background-color: white;
   border-radius: 8px;
-  padding: 16px;
+  padding: 15px;
   margin: 15px;
   display: flex;
   flex-direction: column;
@@ -54,8 +56,10 @@ const CardContainer = styled.div`
   box-shadow: ${(props) =>
     props.types[1].color === ""
       ? `0px 0px 100px 0px ${props.types[0].color}`
-      : `30px 0px 100px 0px ${props.types[1].color},
-        -30px 0px 100px 0px ${props.types[0].color}`};
+      : `-75px -100px 100px -75px ${props.types[0].color},
+       -75px 100px 100px -75px ${props.types[0].color},
+       75px 100px 100px -75px ${props.types[1].color},
+        75px -100px 100px -75px ${props.types[1].color}`};
 `;
 
 const PokemonImage = styled.img`
@@ -64,6 +68,7 @@ const PokemonImage = styled.img`
 `;
 
 const NameText = styled.p`
+  text-align: center;
   font-size: 20px;
   font-weight: bold;
   margin: 0px;
@@ -156,6 +161,10 @@ const Card = ({ pokemon }) => {
       </Buttons>
     </CardContainer>
   );
+};
+
+Card.propTypes = {
+  pokemon: PropTypes.object.isRequired,
 };
 
 export default Card;
