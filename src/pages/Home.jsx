@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
-import styled, { keyframes } from "styled-components";
+import { useState, useEffect } from "react";
+import styled from "styled-components";
 import Card from "../components/Card";
 import Loader from "../components/Loader";
 import Error from "../components/Error";
 import { getPokemonList, getPokemonByName } from "../ApiService";
 import ReactPaginate from "react-paginate";
+import "../styles/Home.css";
 
 //#region css
 
@@ -14,11 +15,24 @@ const Container = styled.div`
   align-items: center;
   width: 100%;
   height: 100%;
+  max-width: 1400px;
 `;
 
 const SearchInputContainer = styled.div`
   margin-bottom: 20px;
 `;
+
+const DeleteSearch = styled.button`
+  background-color: transparent;
+  color: lightgray;
+  font-size: 15px;
+  border: none;
+  &:hover {
+    color: white;
+    cursor: pointer;
+  }
+`;
+
 const SearchInput = styled.input`
   height: 40px;
   width: 250px;
@@ -26,18 +40,6 @@ const SearchInput = styled.input`
   box-sizing: border-box;
   border: 2px solid black;
   border-radius: 20px 0px 0px 20px;
-`;
-
-const pulseAnimation = keyframes`
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.2);
-  }
-  100% {
-    transform: scale(1);
-  }
 `;
 
 const SearchButton = styled.button`
@@ -65,11 +67,11 @@ export default function App() {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [val, setVal] = useState("");
-  const [currentIndex, setCurrentIndex] = useState(1);
   const [IndexNumber, setIndexNumber] = useState(0);
+  const [onSearch, setOnSearch] = useState(false);
 
   useEffect(() => {
-    getPoke();
+    getPoke(1);
   }, []);
 
   const change = (event) => {
@@ -77,11 +79,12 @@ export default function App() {
   };
 
   const getPokeByName = async (value) => {
-    if (value !== "") {
-      setCurrentIndex(1);
+    setOnSearch(true);
+    setVal("");
+    if (value.trim() !== "") {
       setIsLoading(true);
       try {
-        const pokeData = await getPokemonByName(value);
+        const pokeData = await getPokemonByName(value.toLowerCase());
         setError(null);
         setPoke([pokeData]);
         setIsLoading(false);
@@ -90,14 +93,16 @@ export default function App() {
         setIsLoading(false);
       }
     } else {
-      getPoke();
+      getPoke(1);
+      setOnSearch(false);
     }
   };
 
-  const getPoke = async () => {
+  const getPoke = async (value) => {
+    setOnSearch(false);
     try {
       setIsLoading(true);
-      const pokeList = await getPokemonList((currentIndex - 1) * 10, 10);
+      const pokeList = await getPokemonList((value - 1) * 10, 10);
       setIndexNumber(Math.ceil(pokeList.count / 10));
       const pokeListData = await Promise.all(
         pokeList.results.map(async (poke) => {
@@ -113,10 +118,14 @@ export default function App() {
     }
   };
 
+  function handleKeyDown(e) {
+    if (e.key === "Enter") {
+      getPokeByName(val);
+    }
+  }
+
   const handlePageClick = (data) => {
-    setCurrentIndex(data.selected + 1);
-    getPoke();
-    console.log(currentIndex);
+    getPoke(data.selected + 1);
   };
 
   return (
@@ -129,6 +138,7 @@ export default function App() {
           aria-describedby="button-addon"
           value={val}
           onChange={change}
+          onKeyDown={handleKeyDown}
         />
         <SearchButton
           type="button"
@@ -138,6 +148,11 @@ export default function App() {
           <i className="bi bi-search"></i>
         </SearchButton>
       </SearchInputContainer>
+      {!isLoading && onSearch && (
+        <DeleteSearch onClick={() => getPoke(1)}>
+          effacer la recherche
+        </DeleteSearch>
+      )}
       {error && <Error err={error} />}
       {isLoading && <Loader />}
       {!isLoading && !error && (
@@ -147,26 +162,27 @@ export default function App() {
           ))}
         </Cards>
       )}
-      <ReactPaginate
-        nextLabel="next >"
-        onPageChange={handlePageClick}
-        pageRangeDisplayed={2}
-        marginPagesDisplayed={2}
-        pageCount={IndexNumber}
-        previousLabel="< previous"
-        pageClassName="page-item"
-        pageLinkClassName="page-link"
-        previousClassName="page-item"
-        previousLinkClassName="page-link"
-        nextClassName="page-item"
-        nextLinkClassName="page-link"
-        breakLabel="..."
-        breakClassName="page-item"
-        breakLinkClassName="page-link"
-        containerClassName="pagination"
-        activeClassName="active"
-        renderOnZeroPageCount={null}
-      />
+      {!error && !onSearch && (
+        <ReactPaginate
+          onPageChange={handlePageClick}
+          pageRangeDisplayed={2}
+          marginPagesDisplayed={2}
+          pageCount={IndexNumber}
+          previousLabel={
+            <>
+              <i className="bi bi-arrow-left-short"></i> précédent
+            </>
+          }
+          nextLabel={
+            <>
+              suivant <i className="bi bi-arrow-right-short"></i>
+            </>
+          }
+          breakLabel="..."
+          activeClassName="active"
+          renderOnZeroPageCount={null}
+        />
+      )}
     </Container>
   );
 }
