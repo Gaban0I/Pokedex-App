@@ -1,4 +1,4 @@
-ul {
+.paginationContainer {
   padding: 0;
   margin: 0;
   display: flex;
@@ -6,7 +6,7 @@ ul {
   justify-self: flex-end;
   margin-top: 10px;
 }
-li {
+.paginationContainer > li {
   margin: 10px;
   cursor: pointer;
 }

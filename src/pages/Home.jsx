@@ -178,6 +178,7 @@ export default function App() {
               suivant <i className="bi bi-arrow-right-short"></i>
             </>
           }
+          containerClassName="paginationContainer"
           breakLabel="..."
           activeClassName="active"
           renderOnZeroPageCount={null}
