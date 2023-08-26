@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import { STORAGE_NAME } from "../global";
+import PropTypes from "prop-types";
 
 const LikeButtonContainer = styled.button`
   width: 40px;
@@ -24,6 +25,9 @@ const LikeButtonContainer = styled.button`
 
   &.liked {
     border: 1px solid red;
+    &:hover {
+      border: none;
+    }
   }
 
   svg {
@@ -84,6 +88,10 @@ const LikeButton = ({ pokemon }) => {
       <HeartSVG />
     </LikeButtonContainer>
   );
+};
+
+LikeButton.propTypes = {
+  pokemon: PropTypes.object.isRequired,
 };
 
 export default LikeButton;

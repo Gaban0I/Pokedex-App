@@ -1,5 +1,5 @@
-import React from "react";
 import styled from "styled-components";
+import PropTypes from "prop-types";
 
 const ErrorContainer = styled.div`
   display: flex;
@@ -22,6 +22,14 @@ const Error = ({ err }) => {
       <ErrorMessage>Erreur: {err}</ErrorMessage>
     </ErrorContainer>
   );
+};
+
+Error.propTypes = {
+  err: PropTypes.string,
+};
+
+Error.defaultProps = {
+  err: "Une erreur s'est produite.",
 };
 
 export default Error;
