@@ -10,7 +10,10 @@
   margin: 10px;
   cursor: pointer;
 }
-.active {
-  color: white;
-  text-decoration: underline;
+.paginationContainer > li > a {
+  transition: 0.2s linear;
+}
+.active > a {
+  color: white !important;
+  text-decoration: underline 0.15em rgba(255, 255, 255, 1);
 }

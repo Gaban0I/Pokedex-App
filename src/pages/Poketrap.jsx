@@ -5,7 +5,7 @@ import Loader from "../components/Loader";
 import Error from "../components/Error";
 import { getPokemonList, getPokemonByName } from "../ApiService";
 import ReactPaginate from "react-paginate";
-import "../styles/Home.css";
+import "../styles/Poketrap.css";
 
 //#region css
 
