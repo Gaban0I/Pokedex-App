@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import PropTypes from "prop-types";
 import LikeButton from "./LikeButton";
+import { Link } from "react-router-dom";
 
 import normal from "../assets/normal.svg";
 import fighting from "../assets/fighting.svg";
@@ -55,11 +56,14 @@ const CardContainer = styled.div`
   align-items: center;
   box-shadow: ${(props) =>
     props.types[1].color === ""
-      ? `0px 0px 100px 0px ${props.types[0].color}`
-      : `-75px -100px 100px -75px ${props.types[0].color},
+      ? `0px 0px 20px 6px rgba(0,0,0,0.63),
+        0px 0px 100px 0px ${props.types[0].color}`
+      : `0px 0px 20px 6px rgba(0,0,0,0.63),
+         -75px -100px 100px -75px ${props.types[0].color},
        -75px 100px 100px -75px ${props.types[0].color},
        75px 100px 100px -75px ${props.types[1].color},
-        75px -100px 100px -75px ${props.types[1].color}`};
+         75px -100px 100px -75px ${props.types[1].color}
+        `};
 `;
 
 const PokemonImage = styled.img`
@@ -119,6 +123,28 @@ const Buttons = styled.div`
   flex-flow: row-wrap;
   align-items: center;
 `;
+
+const MoreButton = styled.button`
+  margin-left: 10px;
+  height: 40px;
+  box-sizing: border-box;
+  background-color: transparent;
+  cursor: pointer;
+  border: 1px solid transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50px;
+  padding: 0px 10px;
+  color: grey;
+  transition: all 0.2s linear;
+
+  &:hover {
+    color: black;
+    border: 1px solid black;
+  }
+`;
 //#endregion
 
 const Card = ({ pokemon }) => {
@@ -155,9 +181,9 @@ const Card = ({ pokemon }) => {
       </StatText>
       <Buttons>
         <LikeButton pokemon={pokemon} />
-        {/* <Link to={`/pokemon/${pokemon.id}`}>
-          <MoreButton> En savoir plus </MoreButton>
-        </Link> */}
+        <Link to={`/pokemon/${pokemon.name}`}>
+          <MoreButton> en savoir plus </MoreButton>
+        </Link>
       </Buttons>
     </CardContainer>
   );
