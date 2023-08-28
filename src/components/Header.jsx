@@ -23,6 +23,12 @@ const MenuItem = styled.li`
 `;
 const StyledLink = styled(Link)`
   text-decoration: none;
+  text-decoration: underline 0.15em rgba(0, 0, 0, 0);
+  transition: text-decoration-color 300ms;
+  &:hover {
+    text-decoration: underline 0.15em rgb(0, 0, 0, 1);
+  }
+  transition: 0.2s linear;
   color: ${(props) => (props.active ? "black" : "grey")};
   &:hover {
     color: black;
