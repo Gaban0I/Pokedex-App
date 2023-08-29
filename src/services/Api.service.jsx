@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_BASE_URL } from "./global";
+import { API_BASE_URL } from "../global";
 
 export const getPokemonList = async (startIndex, limit) => {
   const response = await axios.get(

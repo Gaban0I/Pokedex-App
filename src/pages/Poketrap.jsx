@@ -3,7 +3,7 @@ import styled from "styled-components";
 import Card from "../components/Card";
 import Loader from "../components/Loader";
 import Error from "../components/Error";
-import { getPokemonList, getPokemonByName } from "../ApiService";
+import { getPokemonList, getPokemonByName } from "../services/Api.service";
 import ReactPaginate from "react-paginate";
 import "../styles/Poketrap.css";
 
@@ -35,7 +35,8 @@ const DeleteSearch = styled.button`
 
 const SearchInput = styled.input`
   height: 40px;
-  width: 250px;
+  width: 50vw;
+  max-width: 250px;
   padding: 5px;
   box-sizing: border-box;
   border: 2px solid black;
@@ -182,6 +183,8 @@ export default function App() {
           containerClassName="paginationContainer"
           breakLabel="..."
           activeClassName="active"
+          pageClassName="page"
+          breakClassName="break"
           renderOnZeroPageCount={null}
         />
       )}

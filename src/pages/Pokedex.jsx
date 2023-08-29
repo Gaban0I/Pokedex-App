@@ -4,7 +4,7 @@ import styled from "styled-components";
 import Error from "../components/Error";
 import Loader from "../components/Loader";
 import Card from "../components/Card";
-import { getPokemonByName } from "../ApiService.jsx";
+import { getPokemonByName } from "../services/Api.service.jsx";
 
 //#region css
 
