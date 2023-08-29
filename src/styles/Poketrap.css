@@ -17,3 +17,10 @@
   color: white !important;
   text-decoration: underline 0.15em rgba(255, 255, 255, 1);
 }
+
+@media screen and (max-width: 600px) {
+  .page,
+  .break {
+    display: none;
+  }
+}
