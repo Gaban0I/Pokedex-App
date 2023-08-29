@@ -4,7 +4,9 @@ import styled from "styled-components";
 import Error from "../components/Error";
 import Loader from "../components/Loader";
 import LikeButton from "../components/LikeButton";
-import { getPokemonByName } from "../ApiService";
+import { getPokemonByName } from "../services/Api.service";
+import shiny from "../assets/shiny.png";
+import pokemonAttributes from "../services/Attribut.service";
 
 //#region css
 const Image = styled.img``;
@@ -15,6 +17,8 @@ const StatValue = styled.span``;
 const TypeList = styled.ul``;
 const TypeItem = styled.li``;
 const NameContainer = styled.div``;
+const ShinyImage = styled.img``;
+const CaracList = styled.div``;
 
 const Container = styled.div`
   padding: 20px;
@@ -23,10 +27,33 @@ const Container = styled.div`
   align-items: center;
 
   & > ${NameContainer} {
+    position: relative;
     display: flex;
     flex-direction: row;
+    align-items: center;
     gap: 20px;
     & > h1 {
+    }
+    & > ${ShinyImage} {
+      left: -25px;
+      top: 10px;
+      position: absolute;
+      width: 25px;
+    }
+  }
+
+  & > ${TypeList} {
+    margin-top: 20px;
+    list-style: none;
+    padding: 0;
+    display: flex;
+
+    & > ${TypeItem} {
+      padding: 5px 10px;
+      margin-right: 8px;
+      background-color: #f5f5f5;
+      color: black;
+      border-radius: 5px;
     }
   }
 
@@ -55,38 +82,41 @@ const Container = styled.div`
         width: 250px;
         height: 20px;
         margin: 5px 0;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
 
         & > div {
           background-color: #4caf50;
           height: 100%;
           border-radius: 4px;
           position: relative;
-
-          & > ${StatValue} {
-            position: absolute;
-            right: 5px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #333;
-            padding: 0 2px;
-            border-radius: 2px;
-            background-color: transparent;
-          }
+        }
+        & > ${StatValue} {
+          color: #333;
+          padding: 0 5px;
+          border-radius: 2px;
+          background-color: transparent;
         }
       }
     }
   }
 
-  & > ${TypeList} {
-    list-style: none;
-    padding: 0;
+  & > ${CaracList} {
     display: flex;
-
-    & > ${TypeItem} {
-      padding: 5px 10px;
-      margin-right: 8px;
-      background-color: #f5f5f5;
-      border-radius: 5px;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+    & > div {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      & > p {
+        width: 250px;
+      }
     }
   }
 `;
@@ -98,6 +128,7 @@ const Pokemon = () => {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [poke, setPoke] = useState(null);
+  const [isShiny, setIsShiny] = useState(false);
 
   useEffect(() => {
     console.log(name);
@@ -105,6 +136,7 @@ const Pokemon = () => {
       setIsLoading(true);
       try {
         const result = await getPokemonByName(name);
+        console.log(result);
         setPoke(result);
         setIsLoading(false);
       } catch (error) {
@@ -123,29 +155,77 @@ const Pokemon = () => {
       {poke && (
         <Container>
           <NameContainer>
+            {isShiny && <ShinyImage src={shiny} />}
             <h1>{poke.name.charAt(0).toUpperCase() + poke.name.slice(1)}</h1>
             <LikeButton pokemon={poke} />
           </NameContainer>
-          <Image src={poke.sprites?.front_default} alt={poke.name} />
+          <TypeList>
+            {poke.types?.map((type, index) => (
+              <TypeItem
+                key={index}
+                style={{
+                  backgroundColor:
+                    pokemonAttributes[type.type.name]?.color ||
+                    pokemonAttributes.default.color,
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: "5px",
+                  color: "white",
+                }}
+              >
+                <img
+                  src={
+                    pokemonAttributes[type.type.name]?.icon ||
+                    pokemonAttributes.default.icon
+                  }
+                  style={{ width: "20px", marginRight: "5px" }}
+                  alt={type.type.name}
+                />
+                {type.type.name.toUpperCase()}
+              </TypeItem>
+            ))}
+          </TypeList>
+          <Image
+            src={
+              isShiny ? poke.sprites?.front_shiny : poke.sprites?.front_default
+            }
+            alt={poke.name}
+            onMouseEnter={() => setIsShiny(true)}
+            onMouseLeave={() => setIsShiny(false)}
+          />
+          <p style={{ marginBottom: "10px" }}>id : #{poke.id}</p>
           <h2>Statistiques</h2>
           <StatList>
             {poke.stats.map((stat, index) => (
               <StatItem key={index}>
                 <span>{stat.stat.name} :</span>
                 <StatBar>
-                  <div style={{ width: `${(stat.base_stat / 255) * 100}%` }}>
-                    <StatValue>{stat.base_stat}</StatValue>
-                  </div>
+                  <div
+                    style={{ width: `${(stat.base_stat / 255) * 100}%` }}
+                  ></div>{" "}
+                  <StatValue>{stat.base_stat}</StatValue>
                 </StatBar>
               </StatItem>
             ))}
           </StatList>
-          <h2>Types</h2>
-          <TypeList>
-            {poke.types?.map((type, index) => (
-              <TypeItem key={index}>{type.type.name.toUpperCase()}</TypeItem>
-            ))}
-          </TypeList>
+          <h2>Caractéristique</h2>
+          <CaracList>
+            <div>
+              <p>Poids :</p> <p>{poke.weight / 10} kg</p>
+            </div>
+            <div>
+              <p>Taille :</p> <p>{poke.height / 10} m</p>
+            </div>
+            <div>
+              <p>capacités :</p>
+              <p>
+                {poke.abilities
+                  ?.map((ability) => ability.ability.name)
+                  .join(", ")}
+              </p>
+            </div>
+          </CaracList>
         </Container>
       )}
     </div>
