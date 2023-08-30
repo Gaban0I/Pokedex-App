@@ -48,7 +48,6 @@ function Pokedex() {
 
   const dispatch = useDispatch();
   const liked = useSelector((state) => state.likes);
-  console.log(liked);
   const fetchPokemonByName = (value) => {
     return getPokemonByName(value)
       .then((result) => result)

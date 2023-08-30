@@ -132,12 +132,10 @@ const Pokemon = () => {
   const [isShiny, setIsShiny] = useState(false);
 
   useEffect(() => {
-    console.log(name);
     const fetchData = async () => {
       setIsLoading(true);
       try {
         const result = await getPokemonByName(name);
-        console.log(result);
         setPoke(result);
         setIsLoading(false);
       } catch (error) {

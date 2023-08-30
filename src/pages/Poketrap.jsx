@@ -87,7 +87,6 @@ export default function App() {
       try {
         const pokeData = await getPokemonByName(value.toLowerCase());
         setError(null);
-        console.log(pokeData);
         setPoke([pokeData]);
         setIsLoading(false);
       } catch (error) {
