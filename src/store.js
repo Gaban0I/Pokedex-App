@@ -1,8 +1,10 @@
-import { configureStore } from '@reduxjs/toolkit'
-import pokeSlice from './reducers/pokeSlice'
+import { configureStore } from "@reduxjs/toolkit";
+import likesReducer from "./features/likesSlice";
 
 const store = configureStore({
-  reducer: pokeSlice,
-})
+  reducer: {
+    likes: likesReducer,
+  },
+});
 
-export default store
+export default store;

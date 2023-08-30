@@ -63,6 +63,7 @@ const Container = styled.div`
   }
 
   & > ${StatList} {
+    margin: 20px 0px;
     list-style: none;
     padding: 0;
 
@@ -108,7 +109,7 @@ const Container = styled.div`
     align-items: center;
     justify-content: center;
     gap: 10px;
-    margin-top: 20px;
+    margin: 20px 0px;
     & > div {
       display: flex;
       flex-direction: row;

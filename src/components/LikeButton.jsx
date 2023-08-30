@@ -1,7 +1,7 @@
-import { useState } from "react";
 import styled from "styled-components";
-import { STORAGE_NAME } from "../global";
 import PropTypes from "prop-types";
+import { useSelector, useDispatch } from "react-redux";
+import { toggleLike } from "../features/likesSlice";
 
 const LikeButtonContainer = styled.button`
   width: 40px;
@@ -52,38 +52,18 @@ const HeartSVG = () => (
 );
 
 const LikeButton = ({ pokemon }) => {
-  const isPokemonLiked = () => {
-    const dataStore = localStorage.getItem(STORAGE_NAME);
-    return dataStore ? JSON.parse(dataStore)[pokemon.name] : false;
-  };
-
-  const [liked, setLiked] = useState(isPokemonLiked());
+  const dispatch = useDispatch();
+  const isLiked = useSelector((state) => state.likes[pokemon.id] || false);
 
   const handleLikeClick = () => {
-    let dataStore = localStorage.getItem(STORAGE_NAME);
-    if (!dataStore) {
-      const newSavedStorage = {};
-      newSavedStorage[pokemon.name] = pokemon.name;
-      localStorage.setItem(STORAGE_NAME, JSON.stringify(newSavedStorage));
-      setLiked(true);
-    } else {
-      dataStore = JSON.parse(dataStore);
-      if (dataStore[pokemon.name]) {
-        delete dataStore[pokemon.name];
-        setLiked(false);
-      } else {
-        dataStore[pokemon.name] = pokemon.name;
-        setLiked(true);
-      }
-      localStorage.setItem(STORAGE_NAME, JSON.stringify(dataStore));
-    }
+    dispatch(toggleLike({ pokemonId: pokemon.id }));
   };
 
   return (
     <LikeButtonContainer
-      liked={liked}
+      liked={isLiked} // Utilisez le state du store Redux
       onClick={handleLikeClick}
-      className={liked ? "liked" : ""}
+      className={isLiked ? "liked" : ""}
     >
       <HeartSVG />
     </LikeButtonContainer>

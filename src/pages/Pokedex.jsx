@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { STORAGE_NAME } from "../global.jsx";
 import styled from "styled-components";
 import Error from "../components/Error";
 import Loader from "../components/Loader";
 import Card from "../components/Card";
 import { getPokemonByName } from "../services/Api.service.jsx";
+import { useSelector, useDispatch } from "react-redux";
+import { deleteAllLikes } from "../features/likesSlice";
 
 //#region css
 
@@ -45,6 +46,9 @@ function Pokedex() {
   const [isLoading, setIsLoading] = useState(true);
   const [saved, setSaved] = useState([]);
 
+  const dispatch = useDispatch();
+  const liked = useSelector((state) => state.likes);
+  console.log(liked);
   const fetchPokemonByName = (value) => {
     return getPokemonByName(value)
       .then((result) => result)
@@ -56,26 +60,22 @@ function Pokedex() {
   };
 
   function deleteAllSaved() {
-    if (STORAGE_NAME in localStorage) localStorage.removeItem(STORAGE_NAME);
+    dispatch(deleteAllLikes());
     setSaved([]);
   }
 
   useEffect(() => {
     setIsLoading(true);
-    let storedSaved = localStorage[STORAGE_NAME];
-    if (!storedSaved) {
-      setIsLoading(false);
-    } else {
-      storedSaved = JSON.parse(storedSaved);
-      const promises = [];
-      for (const key in storedSaved) {
+    const promises = [];
+    for (const key in liked) {
+      if (liked[key]) {
         promises.push(fetchPokemonByName(key));
       }
-      Promise.all(promises).then((values) => {
-        setIsLoading(false);
-        setSaved(values.filter((value) => value));
-      });
     }
+    Promise.all(promises).then((values) => {
+      setIsLoading(false);
+      setSaved(values.filter((value) => value));
+    });
   }, []);
 
   return (
