@@ -31,12 +31,12 @@ const LikeButtonContainer = styled.button`
   }
 
   svg {
-    fill: ${(props) => (props.liked ? "#f44336" : "gray")};
+    fill: ${(props) => (props.liked === "true" ? "#f44336" : "gray")};
     transition: fill 0.2s linear;
   }
 
   &:hover svg {
-    fill: ${(props) => (props.liked ? "#f44336" : "black")};
+    fill: ${(props) => (props.liked === "true" ? "#f44336" : "black")};
   }
 `;
 
@@ -61,7 +61,7 @@ const LikeButton = ({ pokemon }) => {
 
   return (
     <LikeButtonContainer
-      liked={isLiked} // Utilisez le state du store Redux
+      liked={isLiked.toString()} // Utilisez le state du store Redux
       onClick={handleLikeClick}
       className={isLiked ? "liked" : ""}
     >

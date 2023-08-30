@@ -29,7 +29,7 @@ const StyledLink = styled(Link)`
     text-decoration: underline 0.15em rgb(0, 0, 0, 1);
   }
   transition: 0.2s linear;
-  color: ${(props) => (props.active ? "black" : "grey")};
+  color: ${(props) => (props.active === "true" ? "black" : "grey")};
   &:hover {
     color: black;
   }
@@ -53,7 +53,10 @@ function Header() {
   return (
     <Menu>
       <MenuItem>
-        <StyledLink to="/poketrap" active={location.pathname === "/poketrap"}>
+        <StyledLink
+          to="/poketrap"
+          active={location.pathname === "/poketrap" ? "true" : "false"}
+        >
           PokeTrap
         </StyledLink>
       </MenuItem>
@@ -61,7 +64,10 @@ function Header() {
         <Logo src={logo} alt="Logo PokeMania" />
       </MenuItem>
       <MenuItem>
-        <StyledLink to="/pokedex" active={location.pathname === "/pokedex"}>
+        <StyledLink
+          to="/pokedex"
+          active={location.pathname === "/pokedex" ? "true" : "false"}
+        >
           Pokedex
         </StyledLink>
       </MenuItem>
